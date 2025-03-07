@@ -12,11 +12,6 @@ This project implements a **Kubernetes Auto-Healing System** using **GitOps with
 
 ---
 
-## Architecture Diagram
-![Project Architecture](https://your-architecture-diagram-link.com)
-
----
-
 ## Tech Stack
 - **Kubernetes** (GKE, Minikube, or Kind)
 - **ArgoCD** (GitOps)

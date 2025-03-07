@@ -1,0 +1,21 @@
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: k8s-auto-healing-keda
+  namespace: default
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: k8s-auto-healing
+  minReplicaCount: 2
+  maxReplicaCount: 10
+  triggers:
+  - type: cpu
+    metadata:
+      type: Utilization
+      value: "50"
+  - type: memory
+    metadata:
+      type: Utilization
+      value: "50"
