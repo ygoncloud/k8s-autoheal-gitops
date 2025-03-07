@@ -1,6 +1,4 @@
 scripts/
 src/
 terraform/
-.github/
-Makefile
-
+README.md
