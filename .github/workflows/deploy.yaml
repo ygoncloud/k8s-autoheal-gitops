@@ -14,9 +14,8 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Build Docker image
-      run: |
-        docker build -t ghcr.io/your-username/k8s-auto-healing:latest .
-        docker push ghcr.io/your-username/k8s-auto-healing:latest
+      run: |  
+        docker build -f src/Dockerfile -t ghcr.io/your-username/k8s-auto-healing:latest .
 
     - name: Update Kubernetes Manifests
       run: |
