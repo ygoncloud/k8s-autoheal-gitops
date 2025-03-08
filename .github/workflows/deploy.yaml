@@ -16,6 +16,7 @@ jobs:
     - name: Build Docker image
       run: |  
         docker build -f src/Dockerfile -t ghcr.io/your-username/k8s-auto-healing:latest .
+        COPY src/requirements.txt /app/requirements.txt
 
     - name: Update Kubernetes Manifests
       run: |
