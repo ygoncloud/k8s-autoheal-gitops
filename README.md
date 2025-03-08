@@ -102,46 +102,6 @@ kubectl apply -f manifests/deployment.yaml
   argocd app set my-app --sync-policy automated
   ```
 
----
-
-## CI/CD Pipeline
-This project includes a **GitHub Actions workflow** for:
-- Building & pushing Docker images.
-- Updating Kubernetes manifests.
-- Triggering ArgoCD sync.
-
-### Workflow File: `.github/workflows/deploy.yaml`
-```yaml
-name: Deploy to Kubernetes
-
-on:
-  push:
-    branches:
-      - main
-
-jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-
-    - name: Build Docker image
-      run: |
-        docker build -t ghcr.io/your-username/k8s-auto-healing:latest .
-        docker push ghcr.io/your-username/k8s-auto-healing:latest
-
-    - name: Update Kubernetes Manifests
-      run: |
-        sed -i 's|image:.*|image: ghcr.io/your-username/k8s-auto-healing:latest|' manifests/deployment.yaml
-        git commit -am "Updated image to latest version"
-        git push
-
-    - name: Sync with ArgoCD
-      run: |
-        argocd app sync my-app
-```
 
 ---
 
