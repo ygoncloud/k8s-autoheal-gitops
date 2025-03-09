@@ -11,7 +11,7 @@ jobs:
 
     permissions:
       contents: write
-      packages: write  
+      packages: write
 
     steps:
     - name: Checkout code
@@ -22,13 +22,6 @@ jobs:
         git config --global user.email "github-actions@github.com"
         git config --global user.name "GitHub Actions"
 
-    - name: Install ArgoCD CLI
-      run: |
-        curl -sSL -o argocd-linux-amd64 https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
-        chmod +x argocd-linux-amd64
-        sudo mv argocd-linux-amd64 /usr/local/bin/argocd
-        argocd version --client
-
     - name: Log in to GitHub Container Registry (GHCR) using GITHUB_TOKEN
       run: |
         echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
@@ -36,16 +29,28 @@ jobs:
     - name: Build and push Docker image
       run: |
         docker build -f src/Dockerfile -t ghcr.io/${{ github.actor }}/k8s-auto-healing:latest .
-        docker images | grep k8s-auto-healing  # Verify the image exists
+        docker images | grep k8s-auto-healing
         docker push ghcr.io/${{ github.actor }}/k8s-auto-healing:latest
 
     - name: Update Kubernetes Manifests
       run: |
-        sed -i 's|image:.*|image: ghcr.io/${{ github.actor }}/k8s-auto-healing:latest|' manifests/deployment.yaml
-        git add manifests/deployment.yaml
-        git commit -m "Updated image to latest version"
-        git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git HEAD:main
+        CURRENT_IMAGE=$(grep 'image:' manifests/deployment.yaml | awk '{print $2}')
+        NEW_IMAGE="ghcr.io/${{ github.actor }}/k8s-auto-healing:latest"
+
+        if [ "$CURRENT_IMAGE" != "$NEW_IMAGE" ]; then
+          sed -i "s|image:.*|image: $NEW_IMAGE|" manifests/deployment.yaml
+          git add manifests/deployment.yaml
+          git commit -m "Updated image to $NEW_IMAGE"
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git HEAD:main
+        else
+          echo "No changes detected in deployment.yaml, skipping commit."
+        fi
 
     - name: Sync with ArgoCD
       run: |
+        argocd login $ARGOCD_SERVER --username $ARGOCD_USERNAME --password $ARGOCD_PASSWORD --insecure
         argocd app sync my-app
+      env:
+        ARGOCD_SERVER: ${{ secrets.ARGOCD_SERVER }}
+        ARGOCD_USERNAME: ${{ secrets.ARGOCD_USERNAME }}
+        ARGOCD_PASSWORD: ${{ secrets.ARGOCD_PASSWORD }}
