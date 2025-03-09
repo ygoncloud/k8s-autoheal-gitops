@@ -37,7 +37,7 @@ jobs:
         sed -i 's|image:.*|image: ghcr.io/${{ github.actor }}/k8s-auto-healing:latest|' manifests/deployment.yaml
         git add manifests/deployment.yaml
         git commit -m "Updated image to latest version"
-        git push
+        git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git HEAD:main
 
     - name: Sync with ArgoCD
       run: |
