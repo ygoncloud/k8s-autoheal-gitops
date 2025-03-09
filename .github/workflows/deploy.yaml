@@ -9,6 +9,10 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: read
+      packages: write  # Allows pushing to GHCR.io
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
@@ -18,14 +22,19 @@ jobs:
         git config --global user.email "github-actions@github.com"
         git config --global user.name "GitHub Actions"
 
-    - name: Build Docker image
+    - name: Log in to GitHub Container Registry (GHCR) using GITHUB_TOKEN
       run: |
-        docker build -f src/Dockerfile -t ghcr.io/ygoncloud/k8s-auto-healing:latest .
-        docker push ghcr.io/ygoncloud/k8s-auto-healing:latest
+        echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+    - name: Build and push Docker image
+      run: |
+        docker build -f src/Dockerfile -t ghcr.io/${{ github.actor }}/k8s-auto-healing:latest .
+        docker images | grep k8s-auto-healing  # Verify the image exists
+        docker push ghcr.io/${{ github.actor }}/k8s-auto-healing:latest
 
     - name: Update Kubernetes Manifests
       run: |
-        sed -i 's|image:.*|image: ghcr.io/ygoncloud/k8s-auto-healing:latest|' manifests/deployment.yaml
+        sed -i 's|image:.*|image: ghcr.io/${{ github.actor }}/k8s-auto-healing:latest|' manifests/deployment.yaml
         git add manifests/deployment.yaml
         git commit -m "Updated image to latest version"
         git push
@@ -33,4 +42,3 @@ jobs:
     - name: Sync with ArgoCD
       run: |
         argocd app sync my-app
-
