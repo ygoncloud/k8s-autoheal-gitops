@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/ygoncloud/k8s-auto-healing.git
+    repoURL: https://github.com/your_username/k8s-auto-healing.git
     targetRevision: main
     path: manifests
   destination:

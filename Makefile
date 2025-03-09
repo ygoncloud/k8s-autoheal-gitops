@@ -1,5 +1,5 @@
 # Variables
-IMAGE_NAME = ghcr.io/your-username/k8s-auto-healing
+IMAGE_NAME = ghcr.io/your_username/k8s-auto-healing
 TAG = latest
 
 # Build and push Docker image
