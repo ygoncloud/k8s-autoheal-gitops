@@ -20,12 +20,12 @@ jobs:
 
     - name: Build Docker image
       run: |
-        docker build -f src/Dockerfile -t ghcr.io/your-username/k8s-auto-healing:latest .
+        docker build -f src/Dockerfile -t ghcr.io/ygoncloud/k8s-auto-healing:latest .
         docker push ghcr.io/ygoncloud/k8s-auto-healing:latest
 
     - name: Update Kubernetes Manifests
       run: |
-        sed -i 's|image:.*|image: ghcr.io/your-username/k8s-auto-healing:latest|' manifests/deployment.yaml
+        sed -i 's|image:.*|image: ghcr.io/ygoncloud/k8s-auto-healing:latest|' manifests/deployment.yaml
         git add manifests/deployment.yaml
         git commit -m "Updated image to latest version"
         git push
