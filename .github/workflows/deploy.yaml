@@ -11,7 +11,7 @@ jobs:
 
     permissions:
       contents: write
-      packages: write  # Allows pushing to GHCR.io
+      packages: write  
 
     steps:
     - name: Checkout code
