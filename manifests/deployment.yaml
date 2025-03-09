@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: k8s-auto-healing
-        image: ghcr.io/your_username/k8s-auto-healing:latest
+        image: ghcr.io/ygoncloud/k8s-auto-healing:latest
         ports:
         - containerPort: 8080
         livenessProbe:
